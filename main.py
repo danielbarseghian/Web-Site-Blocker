@@ -24,7 +24,7 @@ def main():
 
 			if web.startswith("www."):
 				web = web.removeprefix("www.")
-				
+
 			add_block(web)
 
 		case "2":
@@ -102,4 +102,4 @@ def remove_block(web_name):
 
 main()
 
-# TO ADD tests, cli, regex
+# TO ADD tests
