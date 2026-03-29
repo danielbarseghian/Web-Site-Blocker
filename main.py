@@ -1,16 +1,30 @@
 HOSTS_FILE = "/etc/hosts"
+from colorama import Fore, Style, init
 import re
+import sys
 
 def main():
+	print(Fore.CYAN + "╔════════════════════════════╗")
+	print("║        LOGIN MENU          ║")
+	print("╠════════════════════════════╣")
+	print("║  " + Fore.WHITE + "[1] Add block to website" + Fore.CYAN + "  ║")
+	print("║  " + Fore.WHITE + "[2] Restore file" + Fore.CYAN + "          ║")
+	print("║  " + Fore.WHITE + "[3] Delete a block" + Fore.CYAN + "        ║")
+	print("║  " + Fore.WHITE + "[4] Quit" + Fore.CYAN + "                  ║")
+	print("╚════════════════════════════╝" + Style.RESET_ALL)
+
 	choice = input("Choose between 1 and 4. ")
 	
 	match choice:
 		case "1":
+
 			web = input("what website you want to block? ")
 			while check_url(web) == False:
 				web = input("what website you want to block? ")
-			if re.match(r"^www\.", web):
-				web = web.removeprefix(".www")
+
+			if web.startswith("www."):
+				web = web.removeprefix("www.")
+				
 			add_block(web)
 
 		case "2":
@@ -30,6 +44,9 @@ def main():
 					remove_block(web_name)
 				else:
 					print("Website not registered in file! ")
+		
+		case "4":
+			sys.exit(0)
 
 def check_website(website):
 	if match := re.match(r"^(www\.)?[A-Za-z]+(\.com)?$", website):
