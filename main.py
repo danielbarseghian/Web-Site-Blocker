@@ -1,23 +1,66 @@
 HOSTS_FILE = "/etc/hosts"
+import re
 
 def main():
-	match input("1-4 "):
+	choice = input("Choose between 1 and 4. ")
+	
+	match choice:
 		case "1":
-			add_block(input("website? "))
-		case "2":
-			restore_file()
-		case "3":
-			remove_block(input("web name? "))
+			web = input("what website you want to block? ")
+			while check_url(web) == False:
+				web = input("what website you want to block? ")
+			if re.match(r"^www\.", web):
+				web = web.removeprefix(".www")
+			add_block(web)
 
+		case "2":
+			match input("Do you really want to restore the file (This will delete all of your websites blocked) ? "):
+				case "yes" | "y":	
+					restore_file()
+				case "no" | "n":
+					print("File not restored")
+				case _:
+					print("please respond by yes or no")
+
+		case "3":
+			web_name = input("What is the name of the website you want to delete? ")
+			with open(HOSTS_FILE, "r") as file:
+				content = file.read()
+				if re.match(web_name, content):
+					remove_block(web_name)
+				else:
+					print("Website not registered in file! ")
+
+def check_website(website):
+	if match := re.match(r"^(www\.)?[A-Za-z]+(\.com)?$", website):
+		return (match.group(1), match.group(2))
 
 def add_block(website_to_block):
 	with open(HOSTS_FILE, "a") as file:
 			website_to_block = website_to_block.lower().strip()
 			line = f"127.0.0.1 {website_to_block}\n"
 			file.write(line)
-			line2 = f"127.0.0.1 www.{website_to_block}"
+			line2 = f"127.0.0.1 www.{website_to_block}\n"
 			file.write(line2)
 			
+def check_url(w):
+	ws, domain = check_website(w)
+
+	match ws:
+		case "www.":
+			pass 		# I think its cleaner to check and pass if its false to know that its checked
+		case None:
+			pass
+		case _:
+			return False
+
+	m = re.match(r"^\..+", domain)
+	if m:
+		pass
+	else:
+		return False
+	
+	return True
 
 def restore_file():
 
@@ -41,3 +84,5 @@ def remove_block(web_name):
 		file.writelines(filtered_lines)
 
 main()
+
+# TO ADD tests, cli, regex
