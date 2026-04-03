@@ -17,8 +17,8 @@ def main():
 	
 	match choice:
 		case "1":
-
 			web = input("what website you want to block? ")
+
 			while check_url(web) == False:
 				web = input("what website you want to block? ")
 
@@ -37,14 +37,9 @@ def main():
 					print("please respond by yes or no")
 
 		case "3":
-			web_name = input("What is the name of the website you want to delete? ")
-			with open(HOSTS_FILE, "r") as file:
-				content = file.read()
-				if re.match(web_name, content):
-					remove_block(web_name)
-				else:
-					print("Website not registered in file! ")
-		
+			web_name = input("What's the name of the website you want to unblock? (ex: youtube.com, instagram.com, ...) ")
+			remove_block(web_name)
+
 		case "4":
 			sys.exit(0)
 
@@ -54,29 +49,21 @@ def check_website(website):
 
 def add_block(website_to_block):
 	with open(HOSTS_FILE, "a") as file:
-			website_to_block = website_to_block.lower().strip()
-			line = f"127.0.0.1 {website_to_block}\n"
-			file.write(line)
-			line2 = f"127.0.0.1 www.{website_to_block}\n"
-			file.write(line2)
+		website_to_block = website_to_block.lower().strip()
+		line = f"127.0.0.1 {website_to_block}\n"
+		file.write(line)
+		line2 = f"127.0.0.1 www.{website_to_block}\n"
+		file.write(line2)
 			
 def check_url(w):
 	ws, domain = check_website(w)
 
-	match ws:
-		case "www.":
-			pass 		# I think its cleaner to check and pass if its false to know that its checked
-		case None:
-			pass
-		case _:
-			return False
-
-	m = re.match(r"^\..+", domain)
-	if m:
-		pass
-	else:
+	if not ws == "www." and ws is not None:
 		return False
-	
+
+	if not re.match(r"^\..+", domain):
+		return False
+
 	return True
 
 def restore_file():
@@ -94,12 +81,23 @@ ff02::2 ip6-allrouters
 		file.write(hosts_base_content)
 
 def remove_block(web_name):
-	with open(HOSTS_FILE, "r") as file:
-		filtered_lines = [line for line in file if web_name not in line]
+	target1 = "127.0.0.1 youtube.com"
+	target2 = "127.0.0.1 www.youtube.com"
 
-	with open(HOSTS_FILE, "w") as file:
-		file.writelines(filtered_lines)
+	with open(HOSTS_FILE, "r") as f:
+		lines = f.readlines()
+
+	filtered = []
+
+	for line in lines:
+		clean = line.strip()  # remove \n and spaces
+
+		if clean != target1 and clean != target2:
+			filtered.append(line)
+
+	with open(HOSTS_FILE, "w") as f:
+		f.writelines(filtered)
 
 main()
 
-# TO ADD tests
+# TO ADD tests and fix remove
