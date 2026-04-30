@@ -14,34 +14,41 @@ def main():
 	print("╚════════════════════════════╝" + Style.RESET_ALL)
 
 	choice = input("Choose between 1 and 4. ")
-	
-	match choice:
-		case "1":
-			web = input("what website you want to block? ")
 
-			while check_url(web) == False:
+	try:
+		match choice:
+			case "1":
 				web = input("what website you want to block? ")
 
-			if web.startswith("www."):
-				web = web.removeprefix("www.")
+				while check_url(web) == False:
+					web = input("what website you want to block? ")
 
-			add_block(web)
+				if web.startswith("www."):
+					web = web.removeprefix("www.")
 
-		case "2":
-			match input("Do you really want to restore the file (This will delete all of your websites blocked) ? "):
-				case "yes" | "y":	
-					restore_file()
-				case "no" | "n":
-					print("File not restored")
-				case _:
-					print("please respond by yes or no")
+				add_block(web)
 
-		case "3":
-			web_name = input("What's the name of the website you want to unblock? (ex: youtube.com, instagram.com, ...) ")
-			remove_block(web_name)
+			case "2":
+				match input("Do you really want to restore the file (This will delete all of your websites blocked) ? "):
+					case "yes" | "y":	
+						restore_file()
+					case "no" | "n":
+						print("File not restored")
+					case _:
+						print("please respond by yes or no")
 
-		case "4":
-			sys.exit(0)
+			case "3":
+				web_name = input("What's the name of the website you want to unblock? (ex: youtube.com, instagram.com, ...) ")
+				remove_block(web_name)
+
+			case "4":
+				sys.exit(0)
+	except PermissionError:
+		print("You have to run with sudo! ")
+		sys.exit(1)
+	except TypeError:
+		print("usage: type example.com (no www before...)")
+		sys.exit(2)
 
 def check_website(website):
 	if match := re.match(r"^(www\.)?[A-Za-z]+(\.com)?$", website):
